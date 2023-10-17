@@ -1,0 +1,41 @@
+image: ghcr.io/cirruslabs/flutter:latest
+
+pipelines:
+  default:
+    - step:
+        name: Clean repository
+        script:
+          - flutter clean
+    - step:
+        name: Install dependencies and build
+        script:
+          - git submodule update --init --recursive
+          - git submodule update --recursive --remote
+          - flutter pub get && dart run build_runner build --delete-conflicting-outputs
+          - flutter build web --release
+  # branches:
+  #   develop:
+  #     - step:
+  #         name: Clean repository
+  #         script:
+  #           - flutter clean
+  #     - step:
+  #         name: Install dependencies, build, and deploy
+  #         script:
+  #           - git submodule update --init --recursive
+  #           - git submodule update --recursive --remote
+  #           - flutter pub get && dart run build_runner build --delete-conflicting-outputs
+  #           - flutter build web --release
+  #           - pipe: atlassian/aws-s3-deploy:1.2.0
+  #             variables:
+  #               AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+  #               AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+  #               AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+  #               S3_BUCKET: $AWS_S3_BUCKET/$AWS_S3_FOLDER_PATH
+  #               LOCAL_PATH: 'build/web'
+  #           - pipe: atlassian/aws-cloudfront-invalidate:0.7.0
+  #             variables:
+  #               AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+  #               AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+  #               AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+  #               DISTRIBUTION_ID: 'E15QCAPF0V655F'
